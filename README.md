@@ -15,6 +15,8 @@ Installation uv docs: https://docs.astral.sh/uv/getting-started/installation/#st
 
 3.Prepare .env file based on env.example 
 
+With `APP_LOG_LEVEL=debug` will be enabled SQL logs as well.
+
 4.Run in dev mode:
 ```bash
   $ make dev
@@ -39,3 +41,8 @@ Installation uv docs: https://docs.astral.sh/uv/getting-started/installation/#st
 ```bash
     $ make test
 ```
+
+# Usage
+
+1. Use signup endpoint to get authorisation token
+2. Use token for get_dividends API call

@@ -7,9 +7,24 @@ services:
     env_file:
       - .env.prod
     depends_on:
+      - db
       - redis
 
   redis:
     image: "redis:7"
     ports:
       - "6379:6379"
+
+  db:
+    image: postgres:17
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
