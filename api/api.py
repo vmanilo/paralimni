@@ -1,18 +1,29 @@
+from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from typing import Final, Annotated
 
 import uvicorn
 from bittensor.core.settings import SS58_FORMAT
 from decouple import config
-from fastapi import FastAPI, status
+from fastapi import FastAPI, Depends, status
 from fastapi import Query
 from fastapi.responses import JSONResponse
-from pydantic import AfterValidator
+from pydantic import AfterValidator, BaseModel, EmailStr
 from scalecodec import is_valid_ss58_address
+from sqlalchemy.exc import IntegrityError
 
+from api.auth import authorize
+from db.db import init_db, create_user
 from services.bittensor import Bittensor
 
-app = FastAPI()
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await init_db()
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
 
 default_netuid: Final = config('DEFAULT_NETUID', cast=int)
 default_hotkey: Final = config('DEFAULT_HOTKEY')
@@ -25,7 +36,7 @@ def validate_hotkey(value: str) -> str:
     raise ValueError("hotkey must be a valid SS58 formatted address")
 
 
-@app.get("/api/v1/tao_dividends")
+@app.get("/api/v1/tao_dividends", dependencies=[Depends(authorize)])
 async def get_dividends(
         netuid: Annotated[
             int,
@@ -58,6 +69,29 @@ async def get_dividends(
         "cached": cached,
         "stake_tx_triggered": False
     }
+
+
+class SignupRequest(BaseModel):
+    email: EmailStr
+
+
+@app.post("/api/v1/signup")
+async def signup(data: SignupRequest):
+    try:
+        token = await create_user(str(data.email))
+        return JSONResponse(
+            status_code=status.HTTP_200_OK,
+            content={
+                "token": token,
+            }
+        )
+    except IntegrityError:
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={
+                "error": "User with this email already exists",
+            }
+        )
 
 
 async def start_web_server():
