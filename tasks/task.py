@@ -1,23 +1,24 @@
+import asyncio
 import logging
-import warnings
+import math
 from datetime import datetime
 
+from Crypto.Random import random
+from bittensor.core.async_subtensor import AsyncSubtensor, Balance
+from bittensor_wallet import Wallet
 from celery import Celery
 from decouple import config
 
-warnings.filterwarnings("ignore", category=UserWarning, module="pydantic")
+from services.sentiment_analysis import SentimentAnalyser
 
 logger = logging.getLogger(__name__)
 app = Celery("tasks", broker=f"{config('REDIS_HOST')}/0")
 
 
 @app.task
-def background_task(netuid: int):
-    import asyncio
-    from services.sentiment_analysis import SentimentAnalyser
-
+def background_task(netuid: int, hotkey: str):
     async def process():
-        logger.info("Background task running...")
+        logger.info("Background task starting...")
 
         start = datetime.now()
         analyser = SentimentAnalyser(
@@ -30,6 +31,34 @@ def background_task(netuid: int):
 
         score = await analyser.get_sentiment(netuid)
 
+        # fallback when LLM service doesn't work
+        if score is None:
+            logger.warning('Fallback to random score, some issue with LLM service.')
+            score = random.StrongRandom().randint(-100, 100)
+
         logger.info(f'Sentiment score: {score}, elapsed time: {datetime.now() - start}')
+
+        if score is None:
+            return
+
+        async with AsyncSubtensor(network=config('NETWORK')) as subtensor:
+            wallet = Wallet(name='app_wallet')
+            if wallet.coldkey_file.data is None:
+                wallet = wallet.regenerate_coldkey(mnemonic=config('WALLET_MNEMONIC'), use_password=False,
+                                                   suppress=True, overwrite=False)
+
+            amount = Balance.from_tao(0.01 * math.fabs(score))
+
+            try:
+                if score > 0:
+                    result = await subtensor.add_stake(wallet, hotkey_ss58=hotkey, netuid=netuid, amount=amount)
+                    logger.info(f'add_stake hotkey: {hotkey}, netuid: {netuid}, amount: {amount}, result: {result}')
+                elif score < 0:
+                    result = await subtensor.unstake(wallet, hotkey_ss58=hotkey, netuid=netuid, amount=amount)
+                    logger.info(f'unstake hotkey: {hotkey}, netuid: {netuid}, amount: {amount}, result: {result}')
+            except Exception as e:
+                logger.error(f'Stake/unstake failed due to error: {e}')
+
+        logger.info("Background task completed.")
 
     asyncio.run(process())
