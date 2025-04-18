@@ -616,6 +616,20 @@ wheels = [
 ]
 
 [[package]]
+name = "datura-py"
+version = "0.0.16"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "pydantic" },
+    { name = "requests" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/50/91/d42e17741f3c350851e3ce00615ac8421f0507d4f8dc5c6c0bcce8755892/datura_py-0.0.16.tar.gz", hash = "sha256:d736889499a5b6b5c16516b659dfffb9e8fd0723752acea2c75936a8e6817eda", size = 11403 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/56/98/628c723a7c533f4864a29cdfe76b2cb765c1a98997159a656ac8c7a443c8/datura_py-0.0.16-py3-none-any.whl", hash = "sha256:4d3ba6719f6706cd7027984f5fc23a8af07e689b38f4a80c4792271fc125119a", size = 10869 },
+]
+
+[[package]]
 name = "decorator"
 version = "5.2.1"
 source = { registry = "https://pypi.org/simple" }
@@ -1109,6 +1123,7 @@ dependencies = [
     { name = "aioredis" },
     { name = "asyncpg" },
     { name = "bittensor" },
+    { name = "datura-py" },
     { name = "fastapi" },
     { name = "pydantic", extra = ["email"] },
     { name = "python-decouple" },
@@ -1128,6 +1143,7 @@ requires-dist = [
     { name = "aioredis", specifier = ">=2.0.1" },
     { name = "asyncpg", specifier = ">=0.30.0" },
     { name = "bittensor", specifier = ">=9.3.0" },
+    { name = "datura-py", specifier = ">=0.0.16" },
     { name = "fastapi", extras = ["standard"], specifier = ">=0.110.3" },
     { name = "pydantic", extras = ["email"], specifier = ">=2.11.3" },
     { name = "python-decouple", specifier = ">=3.8" },
