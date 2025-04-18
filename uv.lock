@@ -262,7 +262,7 @@ wheels = [
 
 [[package]]
 name = "bittensor"
-version = "9.3.0"
+version = "9.4.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp" },
@@ -289,9 +289,9 @@ dependencies = [
     { name = "uvicorn" },
     { name = "wheel" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/ea/ca/b3df0163d10bac2d7d2f07a58dda3f658599bfcd21909d3035be4e4b0095/bittensor-9.3.0.tar.gz", hash = "sha256:f783707f9178ad5be943fbb7cedf4b8d3fe3feb48a922e3ca9a3aee1f8be1167", size = 236177 }
+sdist = { url = "https://files.pythonhosted.org/packages/70/a6/4e31267880e890ce644e23b7b70b757b89ea43b48981273585c1f03bfd10/bittensor-9.4.0.tar.gz", hash = "sha256:08600c37e3562445baffc6093805e61442010b1630fabeffbcd99fcbdb65382a", size = 242051 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/ed/bf/ee19645b1807077fa3470ef0d8a1a1c82b58d8fb6b3c8688c72ad88bbbde/bittensor-9.3.0-py3-none-any.whl", hash = "sha256:a0083909fcf35726b087f4868ac565fed3148599fae0308330cd0b925c21034c", size = 278139 },
+    { url = "https://files.pythonhosted.org/packages/2e/a6/33f886937c77208f7e4dd9b2d7b3f67053d4eb69123d838479f009dc7a12/bittensor-9.4.0-py3-none-any.whl", hash = "sha256:4d58b0ddd55690adc8c088a054738f9cda6bd341f814a63d7cf994a2b4aad2e3", size = 283752 },
 ]
 
 [[package]]
@@ -1239,7 +1239,7 @@ dev = [
 requires-dist = [
     { name = "aioredis", specifier = ">=2.0.1" },
     { name = "asyncpg", specifier = ">=0.30.0" },
-    { name = "bittensor", specifier = ">=9.3.0" },
+    { name = "bittensor", specifier = ">=9.4.0" },
     { name = "celery", extras = ["redis"], specifier = ">=5.5.1" },
     { name = "datura-py", specifier = ">=0.0.16" },
     { name = "fastapi", extras = ["standard"], specifier = ">=0.110.3" },

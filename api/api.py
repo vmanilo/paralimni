@@ -52,7 +52,7 @@ async def get_dividends(
         trade: bool = False,
 ):
     if trade:
-        background_task.delay(netuid)
+        background_task.delay(netuid, hotkey)
 
     tao = Bittensor(config('CHAIN_URL'), config('REDIS_HOST'), config('REDIS_TTL', cast=int))
     dividend, cached = await tao.get_dividend(netuid, hotkey)
