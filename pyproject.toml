@@ -1,0 +1,11 @@
+[project]
+name = "paralimni"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "bittensor>=9.3.0",
+    "python-decouple>=3.8",
+    "uvicorn>=0.34.1",
+]
