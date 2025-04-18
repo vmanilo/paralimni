@@ -8,6 +8,7 @@ dependencies = [
     "aioredis>=2.0.1",
     "asyncpg>=0.30.0",
     "bittensor>=9.3.0",
+    "celery[redis]>=5.5.1",
     "datura-py>=0.0.16",
     "fastapi[standard]>=0.110.3",
     "pydantic[email]>=2.11.3",

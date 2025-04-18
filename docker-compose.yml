@@ -1,4 +1,16 @@
 services:
+  worker:
+    build:
+      context: .
+    depends_on:
+      - redis
+    command: uv run celery -A tasks.task:app worker --loglevel=info
+    env_file:
+      - .env.prod
+    environment:
+      - PYTHONPATH=/app
+
+
   app:
     build:
       context: .

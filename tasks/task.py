@@ -1,16 +1,25 @@
-import asyncio
+import logging
+import warnings
+from datetime import datetime
 
+from celery import Celery
 from decouple import config
 
-from api.api import default_netuid
-from services.sentiment_analysis import SentimentAnalyser
+warnings.filterwarnings("ignore", category=UserWarning, module="pydantic")
+
+logger = logging.getLogger(__name__)
+app = Celery("tasks", broker=f"{config('REDIS_HOST')}/0")
 
 
-async def background_task():
-    while True:
-        await asyncio.sleep(10)  # Simulate periodic work (e.g., every 10 seconds)
-        print("Background task running...")
+@app.task
+def background_task(netuid: int):
+    import asyncio
+    from services.sentiment_analysis import SentimentAnalyser
 
+    async def process():
+        logger.info("Background task running...")
+
+        start = datetime.now()
         analyser = SentimentAnalyser(
             datura_api_key=config('DATURA_API_KEY'),
             tweet_days_range=config('TWEET_DAYS_RANGE', cast=int, default=10),
@@ -19,6 +28,8 @@ async def background_task():
             chutest_max_concurrent=config('CHUTES_MAX_CONCURRENT', cast=int, default=5),
         )
 
-        score = await analyser.get_sentiment(netuid=default_netuid)
+        score = await analyser.get_sentiment(netuid)
 
-        print('Sentiment score:', score)
+        logger.info(f'Sentiment score: {score}, elapsed time: {datetime.now() - start}')
+
+    asyncio.run(process())

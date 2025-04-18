@@ -15,6 +15,7 @@ from sqlalchemy.exc import IntegrityError
 from api.auth import authorize
 from db.db import init_db, create_user
 from services.bittensor import Bittensor
+from tasks.task import background_task
 
 
 @asynccontextmanager
@@ -48,9 +49,12 @@ async def get_dividends(
             str,
             AfterValidator(validate_hotkey)
         ] = default_hotkey,
+        trade: bool = False,
 ):
-    tao = Bittensor(config('CHAIN_URL'), config('REDIS_HOST'), config('REDIS_TTL', cast=int))
+    if trade:
+        background_task.delay(netuid)
 
+    tao = Bittensor(config('CHAIN_URL'), config('REDIS_HOST'), config('REDIS_TTL', cast=int))
     dividend, cached = await tao.get_dividend(netuid, hotkey)
 
     if dividend is None:
@@ -67,7 +71,7 @@ async def get_dividends(
         "hotkey": hotkey,
         "dividend": dividend,
         "cached": cached,
-        "stake_tx_triggered": False
+        "stake_tx_triggered": trade
     }
 
 
