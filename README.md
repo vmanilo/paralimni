@@ -32,3 +32,10 @@ Installation uv docs: https://docs.astral.sh/uv/getting-started/installation/#st
 ```
 
 3.Open http://localhost:8000/docs
+
+
+# Run tests
+
+```bash
+    $ make test
+```

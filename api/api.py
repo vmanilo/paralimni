@@ -38,8 +38,9 @@ async def get_dividends(
             AfterValidator(validate_hotkey)
         ] = default_hotkey,
 ):
-    tao = Bittensor(config('CHAIN_URL'))
-    dividend = await tao.get_dividend(netuid, hotkey)
+    tao = Bittensor(config('CHAIN_URL'), config('REDIS_HOST'), config('REDIS_TTL', cast=int))
+
+    dividend, cached = await tao.get_dividend(netuid, hotkey)
 
     if dividend is None:
         return JSONResponse(
@@ -54,7 +55,7 @@ async def get_dividends(
         "netuid": netuid,
         "hotkey": hotkey,
         "dividend": dividend,
-        "cached": False,
+        "cached": cached,
         "stake_tx_triggered": False
     }
 
@@ -66,7 +67,6 @@ async def start_web_server():
     cfg = uvicorn.Config(app,
                          host=config('APP_HOST'),
                          port=config('APP_PORT', cast=int),
-                         log_level=config('APP_LOG_LEVEL', default='info'),
-                         reload=config('APP_RELOAD', cast=bool, default=False))
+                         log_level=config('APP_LOG_LEVEL', default='info'))
     server = uvicorn.Server(cfg)
     await server.serve()
