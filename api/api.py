@@ -29,6 +29,14 @@ app = FastAPI(lifespan=lifespan)
 default_netuid: Final = config('DEFAULT_NETUID', cast=int)
 default_hotkey: Final = config('DEFAULT_HOTKEY')
 
+bittensor = Bittensor(
+    config('CHAIN_URL'),
+    config('REDIS_HOST'),
+    config('REDIS_TTL', cast=int),
+    config('CHAIN_MAX_CONCURRENT', cast=int),
+    config('MAX_RETRIES', cast=int)
+)
+
 
 def validate_hotkey(value: str) -> str:
     if is_valid_ss58_address(value, SS58_FORMAT):
@@ -39,29 +47,30 @@ def validate_hotkey(value: str) -> str:
 
 @app.get("/api/v1/tao_dividends", dependencies=[Depends(authorize)])
 async def get_dividends(
-        netuid: Annotated[
-            int,
-            Query(
-                ge=0,
-            ),
-        ] = default_netuid,
-        hotkey: Annotated[
-            str,
-            AfterValidator(validate_hotkey)
-        ] = default_hotkey,
+        netuid: Annotated[int, Query(ge=0)] = default_netuid,
+        hotkey: Annotated[str, AfterValidator(validate_hotkey)] = default_hotkey,
         trade: bool = False,
 ):
     if trade:
         background_task.delay(netuid, hotkey)
 
-    tao = Bittensor(config('CHAIN_URL'), config('REDIS_HOST'), config('REDIS_TTL', cast=int))
-    dividend, cached = await tao.get_dividend(netuid, hotkey)
+    try:
+        dividend, cached = await bittensor.get_dividend(netuid, hotkey)
+    except Exception as e:
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={
+                "error": f"{e}",
+            }
+        )
 
     if dividend is None:
         return JSONResponse(
-            status_code=status.HTTP_404_NOT_FOUND,
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             content={
-                "error": "Dividend not found",
+                "error": "Service unavailable",
+                "message": "Failed to connect to Bittensor API.",
+                "retry_after": 120
             }
         )
 
@@ -84,14 +93,14 @@ async def signup(data: SignupRequest):
     try:
         token = await create_user(str(data.email))
         return JSONResponse(
-            status_code=status.HTTP_200_OK,
+            status_code=status.HTTP_201_CREATED,
             content={
                 "token": token,
             }
         )
     except IntegrityError:
         return JSONResponse(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_409_CONFLICT,
             content={
                 "error": "User with this email already exists",
             }

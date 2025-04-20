@@ -3,7 +3,6 @@ import logging
 import math
 from datetime import datetime
 
-from Crypto.Random import random
 from bittensor.core.async_subtensor import AsyncSubtensor, Balance
 from bittensor_wallet import Wallet
 from celery import Celery
@@ -30,12 +29,6 @@ def background_task(netuid: int, hotkey: str):
         )
 
         score = await analyser.get_sentiment(netuid)
-
-        # fallback when LLM service doesn't work
-        if score is None:
-            logger.warning('Fallback to random score, some issue with LLM service.')
-            score = random.StrongRandom().randint(-100, 100)
-
         logger.info(f'Sentiment score: {score}, elapsed time: {datetime.now() - start}')
 
         if score is None:

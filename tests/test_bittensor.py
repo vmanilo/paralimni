@@ -19,7 +19,7 @@ async def test_get_dividends_cache_hit(mocker):
     mocker.patch("services.bittensor.CacheHandler", return_value=cache)
     mocker.patch("services.bittensor.ChainHandler", return_value=chain)
 
-    bittensor = Bittensor('', '', 1)
+    bittensor = Bittensor('', '', 1, 1, 1)
 
     # Act
     result, from_cache = await bittensor.get_dividend(netuid=1, hotkey="key123")
@@ -49,7 +49,7 @@ async def test_get_dividends_cache_miss_chain_hit(mocker):
     mocker.patch("services.bittensor.CacheHandler", return_value=cache)
     mocker.patch("services.bittensor.ChainHandler", return_value=chain)
 
-    bittensor = Bittensor('', '', 1)
+    bittensor = Bittensor('', '', 1, 1, 1)
 
     # Act
     result, from_cache = await bittensor.get_dividend(netuid=2, hotkey="key456")
@@ -79,7 +79,7 @@ async def test_get_dividends_cache_miss_chain_miss(mocker):
     mocker.patch("services.bittensor.CacheHandler", return_value=cache)
     mocker.patch("services.bittensor.ChainHandler", return_value=chain)
 
-    bittensor = Bittensor('', '', 1)
+    bittensor = Bittensor('', '', 1, 1, 1)
 
     # Act
     result, from_cache = await bittensor.get_dividend(netuid=3, hotkey="key789")
@@ -110,7 +110,7 @@ async def test_store_dividend_called_on_chain_hit(mocker):
     mocker.patch("services.bittensor.CacheHandler", return_value=cache)
     mocker.patch("services.bittensor.ChainHandler", return_value=chain)
 
-    bittensor = Bittensor('', '', 1)
+    bittensor = Bittensor('', '', 1, 1, 1)
 
     # Act
     await bittensor.get_dividend(netuid=4, hotkey="key999")
