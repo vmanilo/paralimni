@@ -68,3 +68,8 @@ From another terminal run load test
 ```bash
     $ make load-test
 ```
+
+### Demo video
+
+[![Demo video](https://img.youtube.com/vi/NY92v71-DjA/0.jpg)](https://www.youtube.com/watch?v=NY92v71-DjA)
+
