@@ -1,4 +1,10 @@
-# Development
+## Usage
+
+1. Use signup endpoint to get authorisation token
+2. Use token for get_dividends API call
+
+
+### Dev run
 
 1.Required tools: docker, docker-compose, uv
 
@@ -24,7 +30,7 @@ With `APP_LOG_LEVEL=debug` will be enabled SQL logs as well.
 
 5.Open http://localhost:8000/docs
 
-# Prod setup
+### Prod run
 
 1.Prepare .env.prod file based on env.example
 
@@ -36,13 +42,29 @@ With `APP_LOG_LEVEL=debug` will be enabled SQL logs as well.
 3.Open http://localhost:8000/docs
 
 
-# Run tests
+### Run tests
 
 ```bash
     $ make test
 ```
 
-# Usage
+### Run load tests
 
-1. Use signup endpoint to get authorisation token
-2. Use token for get_dividends API call
+Required tool: k6
+
+Installation docs: https://grafana.com/docs/k6/latest/set-up/install-k6/
+```bash
+  $ brew install k6
+```
+
+In one terminal run prod version
+
+```bash
+    $ make prod
+```
+
+From another terminal run load test
+
+```bash
+    $ make load-test
+```
